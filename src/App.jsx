@@ -2,6 +2,7 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
+import Floor from './Floor.jsx'
 import './App.css'
 
 function App() {
@@ -27,6 +28,8 @@ function App() {
         >
           Count is {count}
         </button>
+        {/* Add Floor component below */}
+        <Floor />
       </section>
 
       <div className="ticks"></div>
