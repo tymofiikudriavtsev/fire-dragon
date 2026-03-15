@@ -30,6 +30,14 @@ export default function Floor() {
     light.position.set(5, 10, 7.5);
     scene.add(light);
 
+    // Handle click to change color
+    function handleClick() {
+      // Generate a random bright color
+      const randomColor = `#${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0')}`;
+      material.color.set(randomColor);
+    }
+    renderer.domElement.addEventListener('click', handleClick);
+
     // Animate
     function animate() {
       renderer.render(scene, camera);
@@ -46,6 +54,7 @@ export default function Floor() {
       ) {
         mountRef.current.removeChild(renderer.domElement);
       }
+      renderer.domElement.removeEventListener('click', handleClick);
     };
   }, []);
 
