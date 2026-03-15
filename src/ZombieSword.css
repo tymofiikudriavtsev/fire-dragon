@@ -1,0 +1,23 @@
+.zombie-sword {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 16px;
+}
+
+.zombie-sword-attack {
+  margin-top: 8px;
+  padding: 8px 16px;
+  background: #7fca7a;
+  color: #222;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.zombie-sword-attack:hover {
+  background: #b22222;
+  color: #fff;
+}

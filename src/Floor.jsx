@@ -1,9 +1,11 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import ZombieSword from './ZombieSword';
 import * as THREE from 'three';
 
-export default function Floor() {
   const mountRef = useRef(null);
+  const [attackMsg, setAttackMsg] = useState("");
+  const [zombieHealth, setZombieHealth] = useState(100);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -145,10 +147,22 @@ export default function Floor() {
     };
   }, []);
 
+  function handleSwordAttack() {
+    setAttackMsg("Zombie Sword slashed!");
+    setZombieHealth(h => Math.max(0, h - 20));
+    setTimeout(() => setAttackMsg(""), 1200);
+  }
+
   return (
-    <div
-      ref={mountRef}
-      style={{ width: '100%', height: '300px', border: '2px solid #8fd19e', borderRadius: '10px', margin: '20px auto' }}
-    />
+    <>
+      <div
+        ref={mountRef}
+        style={{ width: '100%', height: '300px', border: '2px solid #8fd19e', borderRadius: '10px', margin: '20px auto' }}
+      />
+      <ZombieSword onAttack={handleSwordAttack} />
+      <div style={{textAlign:'center',marginTop:'8px',fontWeight:'bold',color:'#3a7d3a'}}>Zombie Health: {zombieHealth}</div>
+      {attackMsg && <div style={{textAlign:'center',color:'#b22222',fontWeight:'bold',marginTop:'8px'}}>{attackMsg}</div>}
+    </>
   );
-}
+// ...existing code...
+// ...existing code...
