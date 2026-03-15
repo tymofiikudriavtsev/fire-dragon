@@ -10,6 +10,8 @@ export default function Floor() {
     const height = mountRef.current.clientHeight;
 
     const scene = new THREE.Scene();
+    // Set red sky background
+    scene.background = new THREE.Color(0xff4444);
     const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     camera.position.set(0, 5, 10);
     camera.lookAt(0, 0, 0);
@@ -24,6 +26,14 @@ export default function Floor() {
     const floor = new THREE.Mesh(geometry, material);
     floor.rotation.x = -Math.PI / 2;
     scene.add(floor);
+
+    // Lava ring
+    const lavaGeometry = new THREE.RingGeometry(5.5, 6.5, 64);
+    const lavaMaterial = new THREE.MeshBasicMaterial({ color: 0xff6600, side: THREE.DoubleSide });
+    const lava = new THREE.Mesh(lavaGeometry, lavaMaterial);
+    lava.rotation.x = -Math.PI / 2;
+    lava.position.y = 0.01; // Slightly above the floor
+    scene.add(lava);
 
     // Light
     const light = new THREE.DirectionalLight(0xffffff, 1);
