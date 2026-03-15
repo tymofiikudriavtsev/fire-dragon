@@ -1,16 +1,17 @@
+
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import './Floor.css';
 
 export default function Floor() {
   const mountRef = useRef(null);
 
   useEffect(() => {
+    if (!mountRef.current) return;
     const width = mountRef.current.clientWidth;
     const height = mountRef.current.clientHeight;
 
+    // Scene setup
     const scene = new THREE.Scene();
-    // Set red sky background
     scene.background = new THREE.Color(0xff4444);
     const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     camera.position.set(0, 5, 10);
@@ -32,7 +33,7 @@ export default function Floor() {
     const lavaMaterial = new THREE.MeshBasicMaterial({ color: 0xff6600, side: THREE.DoubleSide });
     const lava = new THREE.Mesh(lavaGeometry, lavaMaterial);
     lava.rotation.x = -Math.PI / 2;
-    lava.position.y = 0.01; // Slightly above the floor
+    lava.position.y = 0.01;
     scene.add(lava);
 
     // Light
@@ -40,9 +41,84 @@ export default function Floor() {
     light.position.set(5, 10, 7.5);
     scene.add(light);
 
-    // Handle click to change color
+    // Zombie group
+    const zombie = new THREE.Group();
+    const bodyGeometry = new THREE.BoxGeometry(0.7, 1.2, 0.4);
+    const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x3a7d3a });
+    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+    body.position.set(0, 0.6, 0);
+    zombie.add(body);
+    const headGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+    const headMaterial = new THREE.MeshPhongMaterial({ color: 0x7ed957 });
+    const head = new THREE.Mesh(headGeometry, headMaterial);
+    head.position.set(0, 1.25, 0);
+    zombie.add(head);
+    scene.add(zombie);
+
+    // Controls
+    let zombieAngle = 0;
+    let zombieZ = 0;
+    let zombieX = 0;
+
+    function moveZombie(dir) {
+      const speed = 0.2;
+      if (dir === 'forward') {
+        zombieZ -= speed * Math.cos(zombieAngle);
+        zombieX -= speed * Math.sin(zombieAngle);
+      } else if (dir === 'backward') {
+        zombieZ += speed * Math.cos(zombieAngle);
+        zombieX += speed * Math.sin(zombieAngle);
+      } else if (dir === 'left') {
+        zombieAngle += Math.PI / 16;
+      } else if (dir === 'right') {
+        zombieAngle -= Math.PI / 16;
+      }
+      zombie.position.set(zombieX, 0, zombieZ);
+      zombie.rotation.y = zombieAngle;
+    }
+
+    // Button controls
+    setTimeout(() => {
+      const forwardBtn = document.getElementById('move-forward');
+      const backwardBtn = document.getElementById('move-backward');
+      const leftBtn = document.getElementById('turn-left');
+      const rightBtn = document.getElementById('turn-right');
+      if (forwardBtn) forwardBtn.onclick = () => moveZombie('forward');
+      if (backwardBtn) backwardBtn.onclick = () => moveZombie('backward');
+      if (leftBtn) leftBtn.onclick = () => moveZombie('left');
+      if (rightBtn) rightBtn.onclick = () => moveZombie('right');
+    }, 100);
+
+    // Keyboard controls
+    function handleKey(e) {
+      if (e.key === 'w') moveZombie('forward');
+      if (e.key === 's') moveZombie('backward');
+      if (e.key === 'a') moveZombie('left');
+      if (e.key === 'd') moveZombie('right');
+    }
+    window.addEventListener('keydown', handleKey);
+
+    // Mouse camera rotation
+    let isDragging = false;
+    let prevX = 0;
+    renderer.domElement.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      prevX = e.clientX;
+    });
+    renderer.domElement.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+    renderer.domElement.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        const delta = e.clientX - prevX;
+        camera.position.x += delta * 0.01;
+        camera.lookAt(0, 0, 0);
+        prevX = e.clientX;
+      }
+    });
+
+    // Handle click to change floor color
     function handleClick() {
-      // Generate a random bright color
       const randomColor = `#${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0')}`;
       material.color.set(randomColor);
     }
@@ -65,6 +141,7 @@ export default function Floor() {
         mountRef.current.removeChild(renderer.domElement);
       }
       renderer.domElement.removeEventListener('click', handleClick);
+      window.removeEventListener('keydown', handleKey);
     };
   }, []);
 
